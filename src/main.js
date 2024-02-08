@@ -9,13 +9,13 @@ const loaderContainer = document.querySelector('.loader');
 const loadMoreButton = document.querySelector('.load-more-btn');
 
 let page = 1;
+const limit = 15;
+const totalPages = Math.ceil(500 / limit);
 let query = '';
 loaderContainer.style.display = 'none';
+
 form.addEventListener('submit', onFormSubmit);
-loadMoreButton.addEventListener('click', () => {
-  loaderContainer.style.display = 'block';
-  searchImages(query).then(data => renderImages(data));
-});
+loadMoreButton.addEventListener('click', onLoadMore);
 
 function onFormSubmit(e) {
   e.preventDefault();
@@ -46,6 +46,29 @@ function onFormSubmit(e) {
     });
 }
 
+async function onLoadMore() {
+  loaderContainer.style.display = 'block';
+  const data = await searchImages(query);
+  renderImages(data);
+  loaderContainer.style.display = 'none';
+
+  const galleryCard = document.querySelector('.photo-card');
+  const cardHeight = galleryCard.getBoundingClientRect().height;
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
+
+  if (page > totalPages) {
+    iziToast.info({
+      position: 'topRight',
+      message: "We're sorry, but you've reached the end of search results.",
+    });
+    loadMoreButton.style.display = 'none';
+  }
+}
+
 async function searchImages(q) {
   const response = await axios.get('https://pixabay.com/api/', {
     params: {
@@ -55,7 +78,7 @@ async function searchImages(q) {
       orientation: 'horizontal',
       safesearch: true,
       page,
-      per_page: 15,
+      per_page: limit,
     },
   });
   page += 1;
