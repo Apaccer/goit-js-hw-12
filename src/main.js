@@ -10,7 +10,6 @@ const loadMoreButton = document.querySelector('.load-more-btn');
 
 let page = 1;
 const limit = 15;
-const totalPages = Math.ceil(500 / limit);
 let query = '';
 loaderContainer.style.display = 'none';
 
@@ -59,7 +58,7 @@ async function onLoadMore() {
     top: cardHeight * 2,
     behavior: 'smooth',
   });
-
+  console.log(totalPages);
   if (page > totalPages) {
     iziToast.info({
       position: 'topRight',
@@ -126,7 +125,8 @@ function imageTemplate(images) {
     `;
 }
 
-function renderImages({ hits }) {
+function renderImages({ hits, totalHits }) {
+  const totalPages = Math.ceil(totalHits / limit);
   if (hits.length > 0) {
     const markup = hits.map(imageTemplate).join('');
     container.insertAdjacentHTML('beforeend', markup);
