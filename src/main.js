@@ -13,7 +13,7 @@ const lightbox = new SimpleLightbox('.photo-card-link', {
 });
 
 let page = 1;
-const limit = 50;
+const limit = 15;
 let query = '';
 loaderContainer.style.display = 'none';
 let totalPages = 0;
