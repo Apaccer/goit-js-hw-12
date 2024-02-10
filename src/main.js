@@ -7,9 +7,13 @@ const form = document.querySelector('.search-form');
 const container = document.querySelector('.gallery');
 const loaderContainer = document.querySelector('.loader');
 const loadMoreButton = document.querySelector('.load-more-btn');
+const lightbox = new SimpleLightbox('.photo-card-link', {
+  captionDelay: 250,
+  captionsData: 'alt',
+});
 
 let page = 1;
-const limit = 15;
+const limit = 50;
 let query = '';
 loaderContainer.style.display = 'none';
 let totalPages = 0;
@@ -26,8 +30,6 @@ function onFormSubmit(e) {
       message: 'Please enter a search query.',
     });
     return;
-  } else {
-    loadMoreButton.style.display = 'none';
   }
   container.innerHTML = '';
   loaderContainer.style.display = 'block';
@@ -122,12 +124,14 @@ function renderImages({ hits, totalHits }) {
   if (hits.length > 0) {
     const markup = hits.map(imageTemplate).join('');
     container.insertAdjacentHTML('beforeend', markup);
-    const lightbox = new SimpleLightbox('.photo-card-link', {
-      captionDelay: 250,
-      captionsData: 'alt',
-    });
     lightbox.refresh();
-    buttonCheck();
+    showButton();
+    if (page > totalPages) {
+      iziToast.info({
+        position: 'topRight',
+        message: "We're sorry, but you've reached the end of search results.",
+      });
+    }
   } else {
     iziToast.error({
       position: 'topRight',
@@ -135,15 +139,15 @@ function renderImages({ hits, totalHits }) {
         'Sorry, there are no images matching your search query. Please try again!',
     });
   }
+  hideButton();
 }
 
-function buttonCheck() {
+function hideButton() {
   if (page > totalPages) {
-    iziToast.info({
-      position: 'topRight',
-      message: "We're sorry, but you've reached the end of search results.",
-    });
-  } else {
-    loadMoreButton.style.display = 'block';
+    loadMoreButton.style.display = 'none';
   }
+}
+
+function showButton() {
+  loadMoreButton.style.display = 'block';
 }
